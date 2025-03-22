@@ -16,21 +16,6 @@ jobs:
     name: Push to HuaweiCloud
     runs-on: ubuntu-latest
     steps:
-    - name: Free up disk space
-      run: |
-        echo "Initial disk status:"
-        df -hT
-
-    - name: Maximize build space
-      uses: easimon/maximize-build-space@master
-      with:
-        root-reserve-mb: 2048
-        swap-size-mb: 128
-        remove-dotnet: 'true'
-
-    - name: Restart docker
-      run: sudo service docker restart
-
     - name: Checkout Code
       uses: actions/checkout@v4
 
@@ -46,25 +31,25 @@ jobs:
         while IFS= read -r line || [ -n "$line" ]; do
             [[ -z "$line" || "$line" =~ ^\s*# ]] && continue
 
-            # 提取原始镜像信息并清洗非法字符
+            # 步骤 1：提取原始镜像并清洗非法字符
             original_image=$(echo "$line" | awk '{print $NF}' | sed 's/@sha256.*//; s/[^a-zA-Z0-9._/-]//g')
-            image_name_tag=$(basename "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g')
-            namespace=$(dirname "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^_*//; s/_*$//')
+            
+            # 步骤 2：分割命名空间和镜像名
+            namespace=$(dirname "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^[._-]*//; s/[._-]*$//')
+            image_name_tag=$(basename "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^[._-]*//; s/[._-]*$//')
 
-            # 生成华为云镜像路径（确保路径合法）
+            # 步骤 3：处理空命名空间（如官方镜像 library/xxx）
+            [[ -z "$namespace" || "$namespace" == "." ]] && namespace="library"
+
+            # 步骤 4：生成华为云镜像路径
             target_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/${namespace}_${image_name_tag}"
+            echo "Processed Image: $target_image"
 
-            # 输出调试信息
-            echo "Processing: Original=$original_image → Target=$target_image"
-
-            # 拉取、标记、推送
-            docker pull "$original_image"
+            # 步骤 5：拉取、标记、推送
+            docker pull "$original_image" || { echo "Failed to pull $original_image"; exit 1; }
             docker tag "$original_image" "$target_image"
-            docker push "$target_image"
+            docker push "$target_image" || { echo "Failed to push $target_image"; exit 1; }
 
-            # 清理
-            docker rmi "$original_image" "$target_image"
+            # 步骤 6：清理镜像
+            docker rmi "$original_image" "$target_image" || true
         done < images.txt
-
-        echo "Final disk status:"
-        df -hT
