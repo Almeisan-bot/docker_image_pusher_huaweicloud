@@ -39,7 +39,8 @@ jobs:
 
     - name: Login to HuaweiCloud SWR
       run: |
-        echo "$HUAWEICLOUD_PASSWORD" | docker login -u "$HUAWEICLOUD_USER" --password-stdin $HUAWEICLOUD_REGISTRY
+        #echo  | docker login -u "$HUAWEICLOUD_USER" -p "$HUAWEICLOUD_PASSWORD" "$HUAWEICLOUD_REGISTRY"
+        docker login -u "$HUAWEICLOUD_USER" -p $HUAWEICLOUD_PASSWORD $HUAWEICLOUD_REGISTRY
 
     - name: Process and push images
       run: |
