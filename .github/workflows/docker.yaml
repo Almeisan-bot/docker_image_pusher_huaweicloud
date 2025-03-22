@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 env:
-  HUAWEICLOUD_REGISTRY: "${{ secrets.HW_REGISTRY }}"            # 华为云仓库地址
+  HUAWEICLOUD_REGISTRY: "${{ secrets.HW_REGISTRY }}"          # 华为云仓库地址
   HUAWEICLOUD_ORG_NAME: "${{ secrets.HW_ORG_NAME }}"          # 华为云仓库名称
   HUAWEICLOUD_USER: "${{ secrets.HW_REGISTRY_USER }}"         # 华为云用户名
   HUAWEICLOUD_PASSWORD: "${{ secrets.HW_REGISTRY_PASSWORD }}" # 华为云用户密码
@@ -39,27 +39,23 @@ jobs:
 
     - name: Login to HuaweiCloud SWR
       run: |
-        #echo  | docker login -u "$HUAWEICLOUD_USER" -p "$HUAWEICLOUD_PASSWORD" "$HUAWEICLOUD_REGISTRY"
         docker login -u "$HUAWEICLOUD_USER" -p $HUAWEICLOUD_PASSWORD $HUAWEICLOUD_REGISTRY
 
     - name: Process and push images
       run: |
-        declare -A duplicate_images
         while IFS= read -r line || [ -n "$line" ]; do
             [[ -z "$line" || "$line" =~ ^\s*# ]] && continue
 
-            # 提取原始镜像信息
-            original_image=$(echo "$line" | awk '{print $NF}' | sed 's/@sha256.*//')
-            image_name_tag=$(basename "$original_image")
-            image_name=$(echo "$image_name_tag" | cut -d: -f1)
-            namespace=$(dirname "$original_image" | awk -F/ '{if(NF>=2) print $(NF-1)}')
+            # 提取原始镜像信息并清洗非法字符
+            original_image=$(echo "$line" | awk '{print $NF}' | sed 's/@sha256.*//; s/[^a-zA-Z0-9._/-]//g')
+            image_name_tag=$(basename "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g')
+            namespace=$(dirname "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^_*//; s/_*$//')
 
-            # 华为云镜像命名规范处理[2](@ref)
-            sanitized_namespace=$(echo "$namespace" | sed 's/[^a-zA-Z0-9_-]//g')
-            sanitized_image=$(echo "$image_name_tag" | sed 's/[^a-zA-Z0-9_-]/_/g')
+            # 生成华为云镜像路径（确保路径合法）
+            target_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/${namespace}_${image_name_tag}"
 
-            # 生成华为云镜像路径
-            target_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/${sanitized_namespace}_${sanitized_image}"
+            # 输出调试信息
+            echo "Processing: Original=$original_image → Target=$target_image"
 
             # 拉取、标记、推送
             docker pull "$original_image"
