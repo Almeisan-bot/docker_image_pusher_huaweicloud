@@ -1,0 +1,17 @@
+[
+  {
+    "image": "ubuntu:latest",
+    "architectures": ["amd64", "arm64", "armv7"],
+    "version": "3.0.0"
+  },
+  {
+    "image": "nginx:stable",
+    "architectures": ["amd64", "arm64"],
+    "version": "1.2.1"
+  },
+  {
+    "image": "alpine:3.12",
+    "architectures": ["armv7"],
+    "version": "3.12.0"
+  }
+]
