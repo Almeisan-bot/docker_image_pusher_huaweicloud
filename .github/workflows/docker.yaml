@@ -1,3 +1,107 @@
+# name: Docker to HuaweiCloud SWR
+
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches: [main]
+
+# env:
+#   HUAWEICLOUD_REGISTRY: "${{ secrets.HW_REGISTRY }}" # 华为云仓库地址
+#   HUAWEICLOUD_ORG_NAME: "${{ secrets.HW_ORG_NAME }}" # 华为云仓库名称
+#   HUAWEICLOUD_USER: "${{ secrets.HW_REGISTRY_USER }}" # 华为云用户名
+#   HUAWEICLOUD_PASSWORD: "${{ secrets.HW_REGISTRY_PASSWORD }}" # 华为云用户密码
+
+# jobs:
+#   build:
+#     name: Push to HuaweiCloud
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: Install jq
+#         run: sudo apt-get update && sudo apt-get install -y jq
+
+#       - name: Docker Setup Buildx
+#         uses: docker/setup-buildx-action@v3
+
+#       - name: Login to HuaweiCloud SWR
+#         run: |
+#           docker login -u "$HUAWEICLOUD_USER" -p $HUAWEICLOUD_PASSWORD $HUAWEICLOUD_REGISTRY
+#         env:
+#           HUAWEICLOUD_USER: ${{ secrets.HW_REGISTRY_USER }}
+#           HUAWEICLOUD_PASSWORD: ${{ secrets.HW_REGISTRY_PASSWORD }}
+
+#       - name: Process and push images
+#         run: |
+#           # 初始化失败镜像列表
+#           failed_images=""
+
+#           # 读取 JSON 文件
+#           IMAGES=$(cat images.json)
+
+#           # 解析 JSON 数据并处理每个镜像
+#           echo "$IMAGES" | jq -c '.[]' | while read -r item; do
+#             image=$(echo "$item" | jq -r '.image')
+#             version=$(echo "$item" | jq -r '.version')
+#             architectures=$(echo "$item" | jq -r '.architectures[]')
+
+#             echo "Processing image: $image, version: $version"
+
+#             for ARCH in $architectures; do
+#               echo "Architecture: $ARCH"
+
+#               # 生成华为云镜像路径，包含架构和版本信息
+#               target_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/${image}:${ARCH}-${version}"
+#               echo "Target image: $target_image"
+
+#               # 拉取原始镜像
+#               if ! docker pull "$image:$version"; then
+#                 echo "Error: Failed to pull $image:$version for architecture $ARCH" >&2
+#                 failed_images+="$image ($version, $ARCH)"
+#                 continue
+#               fi
+
+#               # 标记镜像
+#               if ! docker tag "$image:$version" "$target_image"; then
+#                 echo "Error: Failed to tag $image:$version as $target_image" >&2
+#                 failed_images+="$image ($version, $ARCH)"
+#                 continue
+#               fi
+
+#               # 推送镜像
+#               if ! docker push "$target_image"; then
+#                 echo "Error: Failed to push $target_image" >&2
+#                 failed_images+="$image ($version, $ARCH)"
+#                 continue
+#               fi
+
+#               echo "Successfully processed $image:$version for architecture $ARCH"
+#             done
+#           done
+
+#           # 如果有失败的镜像，发送通知
+#           if [ -n "$failed_images" ]; then
+#             echo "The following images failed to sync:$failed_images" >&2
+#             # 创建 GitHub Issue 通知失败情况
+#             echo "$failed_images" | jq -Rs '.' | xargs -I {} echo "Failed to sync: {}" | github.issues.create({
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               title: 'Image Sync Failed',
+#               body: "The following images failed to sync:$failed_images"
+#             })
+#           else
+#             echo "All images synced successfully."
+#           fi
+#         env:
+#           HUAWEICLOUD_REGISTRY: ${{ secrets.HW_REGISTRY }}
+#           HUAWEICLOUD_ORG_NAME: ${{ secrets.HW_ORG_NAME }}
+#           HUAWEICLOUD_USER: ${{ secrets.HW_REGISTRY_USER }}
+#           HUAWEICLOUD_PASSWORD: ${{ secrets.HW_REGISTRY_PASSWORD }}
+
+
+
+
 name: Docker to HuaweiCloud SWR
 
 on:
