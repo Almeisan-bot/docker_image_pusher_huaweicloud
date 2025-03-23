@@ -2,18 +2,16 @@
   {
     "image": "ubuntu",
     "version": "latest",
-    "architectures": ["linux/amd64", "linux/arm/v7", "linux/arm64/v8", "linux/ppc64le", "linux/riscv64", "linux/s390x"]
-
-    
+    "architectures": ["amd64", "armv7", "arm64v8", "ppc64le", "linux/riscv64", "linux/s390x"]    
   },
   {
     "image": "nginx",
     "version": "stable-perl",
-    "architectures": ["linux/386", "linux/amd64", "linux/arm/v5"]
+    "architectures": ["386", "amd64", "armv5"]
   },
   {
     "image": "alpine",
     "version": "latest",
-    "architectures": ["linux/386", "linux/amd64", "linux/arm/v6", "linux/arm/v7", "linux/arm64/v8", "linux/ppc64le", "linux/riscv64", "linux/s390x"]
+    "architectures": ["386", "amd64", "armv6", "armv7", "arm64v8", "ppc64le", "riscv64", "s390x"]
   }
 ]
