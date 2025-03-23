@@ -11,40 +11,55 @@
 
 
 ### 配置华为云
+#### 获取长期访问指令
 华为云首页：https://www.huaweicloud.com/<br>
 登录华为云，首页搜索容器，选择容器镜像服务 SWR<br>
 ![image](https://github.com/user-attachments/assets/29bf8d98-7d4e-437e-b172-82526202bc20)
+<br>
 
 点击控制台进入容器管理页面<br>
+![image](https://github.com/user-attachments/assets/c46b2253-0a52-47ed-9d85-4ffadc4a8062)
 
-选择右上角的登陆指令
+<br>
+
+在镜像服务控制台总览页面，选择右上角的登陆指令<br>
 ![image](https://github.com/user-attachments/assets/aff2a25f-1646-4fbe-9bf2-6ad289011cc1)
 
+生成长期登陆指令并复制指令<br>
+![image](https://github.com/user-attachments/assets/7f55a99a-a6ce-4d49-94d2-3853b20a0ab5)
 
-选择组织管理，然后创建组织<br>
+例如我的长期登陆指令为：<br>
+```
+docker login -u cn-north-4@NKXXXXXXXXXXXXXS -p 2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx6a2 swr.cn-north-4.myhuaweicloud.com
+```
 
-启用个人实例，创建一个命名空间<br>
 
-（**ALIYUN_NAME_SPACE**）
-![](/doc/命名空间.png)
+需要保存三个值，后面会用到：<br>
+华为云用户名：cn-north-4@NKXXXXXXXXXXXXXS<br>
+华为云用户密码：2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx6a2<br>
+华为云仓库地址：swr.cn-north-4.myhuaweicloud.com<br>
 
-访问凭证–>获取环境变量<br>
-用户名（**ALIYUN_REGISTRY_USER**)<br>
-密码（**ALIYUN_REGISTRY_PASSWORD**)<br>
-仓库地址（**ALIYUN_REGISTRY**）<br>
+#### 创建组织
 
-![](/doc/用户名密码.png)
+镜像服务控制台页面选择组织管理，然后创建组织，并复制组织名称<br>
+![image](https://github.com/user-attachments/assets/4d5ba05f-00c2-4aac-aca2-0fc74da9269c)
 
+现在已经获取到了到了四个值，以下四个变量分别代表：<br>
+
+HW_REGISTRY：华为云仓库地址<br>
+HW_ORG_NAME：华为云组织名称<br>
+HW_REGISTRY_USER：华为云用户名<br>
+HW_REGISTRY_PASSWORD：华为云用户密码<br>
 
 ### Fork本项目
 Fork本项目<br>
 #### 启动Action
-进入您自己的项目，点击Action，启用Github Action功能<br>
+进入自己的项目，点击Action，启用Github Action功能<br>
 #### 配置环境变量
 进入Settings->Secret and variables->Actions->New Repository secret
 ![](doc/配置环境变量.png)
 将上一步的**四个值**<br>
-ALIYUN_NAME_SPACE,ALIYUN_REGISTRY_USER，ALIYUN_REGISTRY_PASSWORD，ALIYUN_REGISTRY<br>
+HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD
 配置成环境变量
 
 ### 添加镜像
@@ -57,7 +72,7 @@ ALIYUN_NAME_SPACE,ALIYUN_REGISTRY_USER，ALIYUN_REGISTRY_PASSWORD，ALIYUN_REGIS
 文件提交后，自动进入Github Action构建
 
 ### 使用镜像
-回到阿里云，镜像仓库，点击任意镜像，可查看镜像状态。(可以改成公开，拉取镜像免登录)
+回到华为云，镜像仓库，点击任意镜像，可查看镜像状态。(可以改成公开，拉取镜像免登录)
 ![](doc/开始使用.png)
 
 在国内服务器pull镜像, 例如：<br>
