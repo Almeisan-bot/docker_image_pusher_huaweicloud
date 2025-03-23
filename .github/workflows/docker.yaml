@@ -1,3 +1,61 @@
+# name: Docker to HuaweiCloud SWR
+
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches: [ main ]
+
+# env:
+#   HUAWEICLOUD_REGISTRY: "${{ secrets.HW_REGISTRY }}"          # 华为云仓库地址
+#   HUAWEICLOUD_ORG_NAME: "${{ secrets.HW_ORG_NAME }}"          # 华为云仓库名称
+#   HUAWEICLOUD_USER: "${{ secrets.HW_REGISTRY_USER }}"         # 华为云用户名
+#   HUAWEICLOUD_PASSWORD: "${{ secrets.HW_REGISTRY_PASSWORD }}" # 华为云用户密码
+
+# jobs:
+#   build:
+#     name: Push to HuaweiCloud
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout Code
+#       uses: actions/checkout@v4
+
+#     - name: Docker Setup Buildx
+#       uses: docker/setup-buildx-action@v3
+
+#     - name: Login to HuaweiCloud SWR
+#       run: |
+#         docker login -u "$HUAWEICLOUD_USER" -p $HUAWEICLOUD_PASSWORD $HUAWEICLOUD_REGISTRY
+
+#     - name: Process and push images
+#       run: |
+#         while IFS= read -r line || [ -n "$line" ]; do
+#             [[ -z "$line" || "$line" =~ ^\s*# ]] && continue
+
+#             # 步骤 1：提取原始镜像并清洗非法字符
+#             original_image=$(echo "$line" | awk '{print $NF}' | sed 's/@sha256.*//; s/[^a-zA-Z0-9._/-]//g')
+            
+#             # 步骤 2：分割命名空间和镜像名
+#             namespace=$(dirname "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^[._-]*//; s/[._-]*$//')
+#             image_name_tag=$(basename "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^[._-]*//; s/[._-]*$//')
+
+#             # 步骤 3：处理空命名空间（如官方镜像 library/xxx）
+#             [[ -z "$namespace" || "$namespace" == "." ]] && namespace="library"
+
+#             # 步骤 4：生成华为云镜像路径
+#             target_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/${namespace}_${image_name_tag}"
+#             echo "Processed Image: $target_image"
+
+#             # 步骤 5：拉取、标记、推送
+#             docker pull "$original_image" || { echo "Failed to pull $original_image"; exit 1; }
+#             docker tag "$original_image" "$target_image"
+#             docker push "$target_image" || { echo "Failed to push $target_image"; exit 1; }
+
+#             # 步骤 6：清理镜像
+#             docker rmi "$original_image" "$target_image" || true
+#         done < images.txt
+
+
+
 name: Docker to HuaweiCloud SWR
 
 on:
@@ -19,37 +77,69 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
     - name: Docker Setup Buildx
       uses: docker/setup-buildx-action@v3
 
     - name: Login to HuaweiCloud SWR
       run: |
         docker login -u "$HUAWEICLOUD_USER" -p $HUAWEICLOUD_PASSWORD $HUAWEICLOUD_REGISTRY
+      env:
+        HUAWEICLOUD_USER: ${{ secrets.HW_REGISTRY_USER }}
+        HUAWEICLOUD_PASSWORD: ${{ secrets.HW_REGISTRY_PASSWORD }}
 
     - name: Process and push images
       run: |
-        while IFS= read -r line || [ -n "$line" ]; do
-            [[ -z "$line" || "$line" =~ ^\s*# ]] && continue
+        # 读取 JSON 文件
+        IMAGES=$(cat images.json)
 
-            # 步骤 1：提取原始镜像并清洗非法字符
-            original_image=$(echo "$line" | awk '{print $NF}' | sed 's/@sha256.*//; s/[^a-zA-Z0-9._/-]//g')
-            
-            # 步骤 2：分割命名空间和镜像名
-            namespace=$(dirname "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^[._-]*//; s/[._-]*$//')
-            image_name_tag=$(basename "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^[._-]*//; s/[._-]*$//')
+        # 解析 JSON 数据
+        echo "$IMAGES" | jq -c '.[]' | while read -r item; do
+          image=$(echo "$item" | jq -r '.image')
+          architectures=$(echo "$item" | jq -r '.architectures[]')
+          version=$(echo "$item" | jq -r '.version')
 
-            # 步骤 3：处理空命名空间（如官方镜像 library/xxx）
-            [[ -z "$namespace" || "$namespace" == "." ]] && namespace="library"
+          echo "Processing image: $image, version: $version"
 
-            # 步骤 4：生成华为云镜像路径
-            target_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/${namespace}_${image_name_tag}"
+          # 步骤 1：清洗非法字符
+          original_image=$(echo "$image" | sed 's/@sha256.*//; s/[^a-zA-Z0-9._/-]//g')
+          
+          # 步骤 2：分割命名空间和镜像名
+          namespace=$(dirname "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^[._-]*//; s/[._-]*$//')
+          image_name_tag=$(basename "$original_image" | sed 's/[^a-zA-Z0-9._-]/_/g; s/^[._-]*//; s/[._-]*$//')
+
+          # 步骤 3：处理空命名空间
+          [[ -z "$namespace" || "$namespace" == "." ]] && namespace="library"
+
+          for ARCH in $architectures; do
+            # 步骤 4：生成华为云镜像路径，包含架构和版本信息
+            target_image="$HUAWEICLOUD_REGISTRY/$HUAWEICLOUD_ORG_NAME/${namespace}_${image_name_tag}:${ARCH}-${version}"
             echo "Processed Image: $target_image"
 
             # 步骤 5：拉取、标记、推送
-            docker pull "$original_image" || { echo "Failed to pull $original_image"; exit 1; }
-            docker tag "$original_image" "$target_image"
-            docker push "$target_image" || { echo "Failed to push $target_image"; exit 1; }
+            if ! docker pull "$original_image"; then
+              echo "Failed to pull $original_image" >&2
+              continue
+            fi
+
+            if ! docker tag "$original_image" "$target_image"; then
+              echo "Failed to tag $original_image as $target_image" >&2
+              continue
+            fi
+
+            if ! docker push "$target_image"; then
+              echo "Failed to push $target_image" >&2
+              continue
+            fi
 
             # 步骤 6：清理镜像
             docker rmi "$original_image" "$target_image" || true
-        done < images.txt
+          done
+        done
+      env:
+        HUAWEICLOUD_REGISTRY: ${{ secrets.HW_REGISTRY }}
+        HUAWEICLOUD_ORG_NAME: ${{ secrets.HW_ORG_NAME }}
+        HUAWEICLOUD_USER: ${{ secrets.HW_REGISTRY_USER }}
+        HUAWEICLOUD_PASSWORD: ${{ secrets.HW_REGISTRY_PASSWORD }}
