@@ -82,15 +82,13 @@ jobs:
 
         # 如果有失败的镜像，发送通知
         if [ -n "$failed_images" ]; then
-          echo "The following images failed to sync:
-$failed_images" >&2
+          echo "The following images failed to sync:$failed_images" >&2
           # 创建 GitHub Issue 通知失败情况
           echo "$failed_images" | jq -Rs '.' | xargs -I {} echo "Failed to sync: {}" | github.issues.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: 'Image Sync Failed',
-            body: "The following images failed to sync:
-$failed_images"
+            body: "The following images failed to sync:$failed_images"
           })
         else
           echo "All images synced successfully."
