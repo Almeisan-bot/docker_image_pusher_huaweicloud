@@ -58,24 +58,21 @@ jobs:
             # 拉取原始镜像
             if ! docker pull "$image:$version"; then
               echo "Error: Failed to pull $image:$version for architecture $ARCH" >&2
-              failed_images+="$image ($version, $ARCH)
-"
+              failed_images+="$image ($version, $ARCH)"
               continue
             fi
 
             # 标记镜像
             if ! docker tag "$image:$version" "$target_image"; then
               echo "Error: Failed to tag $image:$version as $target_image" >&2
-              failed_images+="$image ($version, $ARCH)
-"
+              failed_images+="$image ($version, $ARCH)"
               continue
             fi
 
             # 推送镜像
             if ! docker push "$target_image"; then
               echo "Error: Failed to push $target_image" >&2
-              failed_images+="$image ($version, $ARCH)
-"
+              failed_images+="$image ($version, $ARCH)"
               continue
             fi
 
