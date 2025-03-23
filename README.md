@@ -85,10 +85,11 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 #### 示例
 
 **nginx镜像信息如下：**<br>
-![nginx](image.png)
+![image](https://github.com/user-attachments/assets/e3489aac-a15e-4e38-a087-5e1d924f81f0)
+<br>
 **ubuntu镜像信息如下：**<br>
-![alt text](image-1.png)
-
+![image](https://github.com/user-attachments/assets/b4f484ba-4fc1-4f1d-970c-cbea74da2b80)
+<br>
 根据图中所示的信息编写的json文件如下：
 ```
 [
@@ -120,9 +121,11 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 
 ### 使用镜像
 回到华为云，镜像仓库，点击任意镜像，可查看镜像状态，可以改成公开，拉取镜像免登录。<br>
-![alt text](image-4.png)
+![image](https://github.com/user-attachments/assets/352d1d64-728e-49a9-809f-d44486b43b0d)
+<br>
 要在服务器上拉取华为云镜像仓库中的镜像, 具体使用方法请打开仓库中的镜像详情查看。<br>
-![alt text](image-2.png)
+![image](https://github.com/user-attachments/assets/3671a5f6-2c12-4b86-b469-495b3dae1164)
+
 
 ### 定时执行
 修改/.github/workflows/docker.yaml文件
