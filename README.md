@@ -56,11 +56,12 @@ Fork本项目<br>
 #### 启动Action
 进入自己的项目，点击Action，启用Github Action功能<br>
 #### 配置环境变量
-进入Settings->Secret and variables->Actions->New Repository secret
-![](doc/配置环境变量.png)
+进入Settings->Secret and variables->Actions->New Repository secret<br>
 将上一步的**四个值**<br>
-HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD
-配置成环境变量
+HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
+配置成环境变量<br>
+![image](https://github.com/user-attachments/assets/2aee2a32-9fb0-4d01-b026-c1909c414240)
+
 
 ### 添加镜像
 打开images.txt文件，添加你想要的镜像 
