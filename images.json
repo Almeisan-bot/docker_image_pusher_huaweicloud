@@ -1,37 +1,9 @@
 [
   {
-    "image": "ubuntu",
-    "version": "noble-20250127",
-    "architectures": [
-      "amd64", 
-      "armv7",
-      "arm64v8",
-      "ppc64le",
-      "riscv64",
-      "s390x"
-    ]
-  },
-  {
-    "image": "nginx",
-    "version": "stable-perl",
-    "architectures": [
-      "386",
-      "amd64",
-      "armv5"
-    ]
-  },
-  {
-    "image": "alpine",
+    "image": "quay.io/vaultwarden/server",
     "version": "latest",
     "architectures": [
-      "386",
-      "amd64",
-      "armv6",
-      "armv7",
-      "arm64v8",
-      "ppc64le",
-      "riscv64",
-      "s390x"
+      "amd64"
     ]
   }
 ]
