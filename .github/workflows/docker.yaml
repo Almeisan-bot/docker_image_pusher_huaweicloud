@@ -32,9 +32,10 @@ jobs:
 
     - name: Login to HuaweiCloud SWR
       run: |
-        echo "$HUAWEICLOUD_PASSWORD" | docker login $HUAWEICLOUD_REGISTRY \
-          -u "$HUAWEICLOUD_USER" \
-          --password-stdin
+        docker login -u "$HUAWEICLOUD_USER" -p $HUAWEICLOUD_PASSWORD $HUAWEICLOUD_REGISTRY
+      env:
+        HUAWEICLOUD_USER: ${{ secrets.HW_REGISTRY_USER }}
+        HUAWEICLOUD_PASSWORD: ${{ secrets.HW_REGISTRY_PASSWORD }}
 
     - name: Process and push images
       run: |
