@@ -28,7 +28,7 @@
 生成长期登陆指令并复制指令<br>
 ![image](https://github.com/user-attachments/assets/7f55a99a-a6ce-4d49-94d2-3853b20a0ab5)
 
-例如我的长期登陆指令为：<br>
+例如长期登陆指令为：<br>
 ```
 docker login -u cn-north-4@NKXXXXXXXXXXXXXS -p 2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx6a2 swr.cn-north-4.myhuaweicloud.com
 ```
