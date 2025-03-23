@@ -64,44 +64,65 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 
 
 ### 添加镜像
-打开images.txt文件，添加你想要的镜像 
-可以加tag，也可以不用(默认latest)<br>
-可添加 --platform=xxxxx 的参数指定镜像架构<br>
-可使用 k8s.gcr.io/kube-state-metrics/kube-state-metrics 格式指定私库<br>
-可使用 #开头作为注释<br>
-![image](https://github.com/user-attachments/assets/7a308bfe-5943-49a6-8b7a-ed5c08834434)
+#### json文件内容
+打开images.json文件，根据docker官方的镜像信息填写需要同步的镜像信息<br>
+- image字段：填写镜像仓库地址，支持以下格式：<br>
+    - 官方镜像<br>
+    - 第三方镜像：bitnami/nginx → 保持原命名空间<br>
+    - 带标签镜像：alpine:3.18 → 自动剥离标签保留名称<br>
+- version字段：镜像版本号，如latest，noble-20250127等。
+- architectures字段：填写镜像的系统架构，支持同步多架构的镜像，需与Docker官方平台标识的架构严格对应，对应关系如下。
+    - linux/386：386<br>
+    - linux/amd64：amd64<br>
+    - linux/arm/v5：armv5<br>
+    - linux/arm/v6：armv6<br>
+    - linux/arm/v7：armv7<br>
+    - linux/arm64/v8：arm64v8<br>
+    - linux/mips64le：mips64le<br>
+    - linux/ppc64le：ppc64le<br>
+    - linux/s390x：s390x<br>
+
+#### 示例
+
+**nginx镜像信息如下：**<br>
+![nginx](image.png)
+**ubuntu镜像信息如下：**<br>
+![alt text](image-1.png)
+
+根据图中所示的信息编写的json文件如下：
+```
+[
+    {
+    "image": "ubuntu",
+    "version": "noble-20250127",
+    "architectures": [
+      "amd64", 
+      "armv7",
+      "arm64v8",
+      "ppc64le",
+      "riscv64",
+      "s390x"
+    ]
+  },
+  {
+    "image": "nginx",
+    "version": "stable-perl",
+    "architectures": [
+      "386",
+      "amd64",
+      "armv5"
+    ]
+  },
+]
+```
 
 提交文件后，会自动执行Github Action，向华为云镜像仓库上传镜像<br>
 
 ### 使用镜像
-回到华为云，镜像仓库，点击任意镜像，可查看镜像状态。(可以改成公开，拉取镜像免登录)
-![image](https://github.com/user-attachments/assets/0a7963a1-c356-416f-b4e4-4c2bff412338)
-
-在国内服务器pull镜像, 例如：<br>
-
-```
-podman pull swr.cn-north-4.myhuaweicloud.com/personal-docker-image-1/quay.io_vaultwarden_server:latest
-docker pull swr.cn-north-4.myhuaweicloud.com/personal-docker-image-1/quay.io_vaultwarden_server:latest
-```
-
-swr.cn-north-4.myhuaweicloud.com 即 HW_REGISTRY（华为云仓库地址）<br>
-personal-docker-image-1 即 HW_ORG_NAME（华为云组织名称)<br>
-quay.io_vaultwarden_server 即华为云中显示的镜像名称<br>
-
-### 多架构
-需要在images.txt中用 --platform=xxxxx手动指定镜像架构
-指定后的架构会以前缀的形式放在镜像名字前面
-![](doc/多架构.png)
-
-### 镜像重名
-程序自动判断是否存在名称相同, 但是属于不同命名空间的情况。
-如果存在，会把命名空间作为前缀加在镜像名称前。
-例如:
-```
-xhofe/alist
-xiaoyaliu/alist
-```
-![](doc/镜像重名.png)
+回到华为云，镜像仓库，点击任意镜像，可查看镜像状态，可以改成公开，拉取镜像免登录。<br>
+![alt text](image-4.png)
+要在服务器上拉取华为云镜像仓库中的镜像, 具体使用方法请打开仓库中的镜像详情查看。<br>
+![alt text](image-2.png)
 
 ### 定时执行
 修改/.github/workflows/docker.yaml文件
