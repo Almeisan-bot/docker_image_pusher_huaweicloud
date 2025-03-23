@@ -3,8 +3,10 @@ name: Docker to HuaweiCloud SWR
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
-
+    branches:
+      - main
+    paths: 
+      - 'images.json'
 env:
   HUAWEICLOUD_REGISTRY: "${{ secrets.HW_REGISTRY }}" 
   HUAWEICLOUD_ORG_NAME: "${{ secrets.HW_ORG_NAME }}" 
