@@ -10,10 +10,20 @@
 ## 使用方式
 
 
-### 配置阿里云
-登录华为云容器镜像服务<br>
-https://cr.console.aliyun.com/<br>
-启用个人实例，创建一个命名空间
+### 配置华为云
+华为云首页：https://www.huaweicloud.com/<br>
+登录华为云，首页搜索容器，选择容器镜像服务 SWR<br>
+![image](https://github.com/user-attachments/assets/29bf8d98-7d4e-437e-b172-82526202bc20)
+
+点击控制台进入容器管理页面<br>
+
+选择右上角的登陆指令
+![image](https://github.com/user-attachments/assets/aff2a25f-1646-4fbe-9bf2-6ad289011cc1)
+
+
+选择组织管理，然后创建组织<br>
+
+启用个人实例，创建一个命名空间<br>
 
 （**ALIYUN_NAME_SPACE**）
 ![](/doc/命名空间.png)
