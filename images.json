@@ -1,9 +1,10 @@
 [
   {
-    "image": "quay.io/vaultwarden/server",
+    "image": "vaultwarden/server",
     "version": "latest",
     "architectures": [
-      "amd64"
+      "amd64",
+      "arm64"
     ]
   }
 ]
