@@ -1,17 +1,17 @@
 [
   {
-    "image": "ubuntu:latest",
+    "image": "ubuntu",
     "architectures": ["amd64", "arm64", "armv7"],
-    "version": "3.0.0"
+    "version": "latest"
   },
   {
-    "image": "nginx:stable",
+    "image": "nginx",
     "architectures": ["amd64", "arm64"],
-    "version": "1.2.1"
+    "version": "stable-perl"
   },
   {
-    "image": "alpine:3.12",
+    "image": "alpine",
     "architectures": ["armv7"],
-    "version": "3.12.0"
+    "version": "latest"
   }
 ]
