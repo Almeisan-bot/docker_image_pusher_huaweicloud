@@ -69,20 +69,24 @@ HW_REGISTRY，HW_ORG_NAME，HW_REGISTRY_USER，HW_REGISTRY_PASSWORD<br>
 可添加 --platform=xxxxx 的参数指定镜像架构<br>
 可使用 k8s.gcr.io/kube-state-metrics/kube-state-metrics 格式指定私库<br>
 可使用 #开头作为注释<br>
-![](doc/images.png)
-文件提交后，自动进入Github Action构建
+![image](https://github.com/user-attachments/assets/7a308bfe-5943-49a6-8b7a-ed5c08834434)
+
+提交文件后，会自动执行Github Action，向华为云镜像仓库上传镜像<br>
 
 ### 使用镜像
 回到华为云，镜像仓库，点击任意镜像，可查看镜像状态。(可以改成公开，拉取镜像免登录)
-![](doc/开始使用.png)
+![image](https://github.com/user-attachments/assets/0a7963a1-c356-416f-b4e4-4c2bff412338)
 
 在国内服务器pull镜像, 例如：<br>
+
 ```
-docker pull registry.cn-hangzhou.aliyuncs.com/shrimp-images/alpine
+podman pull swr.cn-north-4.myhuaweicloud.com/personal-docker-image-1/quay.io_vaultwarden_server:latest
+docker pull swr.cn-north-4.myhuaweicloud.com/personal-docker-image-1/quay.io_vaultwarden_server:latest
 ```
-registry.cn-hangzhou.aliyuncs.com 即 ALIYUN_REGISTRY(阿里云仓库地址)<br>
-shrimp-images 即 ALIYUN_NAME_SPACE(阿里云命名空间)<br>
-alpine 即 阿里云中显示的镜像名<br>
+
+swr.cn-north-4.myhuaweicloud.com 即 HW_REGISTRY（华为云仓库地址）<br>
+personal-docker-image-1 即 HW_ORG_NAME（华为云组织名称)<br>
+quay.io_vaultwarden_server 即华为云中显示的镜像名称<br>
 
 ### 多架构
 需要在images.txt中用 --platform=xxxxx手动指定镜像架构
