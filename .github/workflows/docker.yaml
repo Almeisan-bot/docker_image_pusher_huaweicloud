@@ -67,7 +67,7 @@ jobs:
             target_tag="${arch}-${version}"
             platform=${ARCH_MAP[$arch]}
             
-            echo "▶️ Processing $clean_image (arch: $arch, platform: $platform)"
+            echo "Processing $clean_image (arch: $arch, platform: $platform)"
             
             # 拉取指定架构镜像
             docker pull --platform "$platform" "$clean_image"
